@@ -18,7 +18,7 @@ TABLES = {
     "order_items": ["id", "order_id", "product_id", "quantity", "price"],
 }
 
-# Путь к файлу логов берём из переменной окружения (если не задан — в файл не пишем)
+# 6.7
 LOG_FILE = os.getenv("LOG_FILE")
 
 
@@ -125,16 +125,14 @@ def print_rows(cursor):
 
 
 # ---------------------------------------------------------------- 6.1 просмотр
-
+# 6.1.1
 def show_all(cursor):
     table = choose_table()
-
-    # SELECT * FROM "table" ORDER BY id
     query = sql.SQL("SELECT * FROM {} ORDER BY id").format(sql.Identifier(table))
     cursor.execute(query)
     print_rows(cursor)
 
-
+# 6.1.2
 def show_filtered_by_one(cursor):
     table = choose_table()
     column = choose_one("По какой колонке фильтровать?", TABLES[table])
@@ -147,7 +145,7 @@ def show_filtered_by_one(cursor):
     cursor.execute(query, [value])
     print_rows(cursor)
 
-
+# 6.1.3
 def show_filtered_by_many(cursor):
     table = choose_table()
     columns = choose_many("По каким колонкам фильтровать?", TABLES[table])
@@ -166,6 +164,7 @@ def show_filtered_by_many(cursor):
 
 # ---------------------------------------------------------------- 6.2 обновление
 
+#6.2.1
 def update_one(cursor):
     table = choose_table()
     record_id = input("id записи, которую нужно изменить: ")
@@ -182,7 +181,7 @@ def update_one(cursor):
     cursor.execute(query, values + [record_id])
     print(f"Изменено записей: {cursor.rowcount}")
 
-
+#6.2.2
 def update_many(cursor):
     table = choose_table()
     column = choose_one("Какую колонку изменить?", columns_without_id(table))
@@ -214,7 +213,7 @@ def build_insert(table, columns):
         sql.SQL(", ").join([sql.Placeholder()] * len(columns)),
     )
 
-
+#6.3.1
 def insert_one(cursor):
     table = choose_table()
     columns = columns_without_id(table)
@@ -224,7 +223,7 @@ def insert_one(cursor):
     new_id = cursor.fetchone()[0]
     print(f"Добавлена запись с id = {new_id}")
 
-
+#6.4.1
 def insert_many(cursor):
     table = choose_table()
     columns = columns_without_id(table)
@@ -267,7 +266,7 @@ def insert_order_with_item(cursor):
     print(f"Создан заказ id = {order_id}. Товар в заказе:")
     add_order_item(cursor, order_id)
 
-
+#6.4.2
 def insert_orders_with_items(cursor):
     orders_count = ask_count("Сколько заказов добавить? ")
     for number in range(1, orders_count + 1):
@@ -305,6 +304,7 @@ def main():
     config = load_config()
 
     username = input("Введите логин БД: ")
+    #6.6 getpass
     password = getpass("Введите пароль БД: ")
 
     connection_params = {
