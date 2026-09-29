@@ -1,6 +1,6 @@
 services:
   db:
-    build: .
+    build: ./db
 
     container_name: postgres18
 
@@ -19,12 +19,26 @@ services:
 
     volumes:
       - postgres_data:/var/lib/postgresql
+      # Скрипты из ./sql выполняются автоматически при ПЕРВОМ запуске (пока БД пустая)
+      - ./sql:/docker-entrypoint-initdb.d
 
   adminer:
     image: adminer
     restart: always
     ports:
       - "8080:8080"
+
+  app:
+    image: rzps-app:1.0
+    depends_on:
+      - db
+    env_file:
+      - ./app/.env
+    # Интерактивный режим: чтобы можно было вводить данные с клавиатуры
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./logs:/app/logs
 
 volumes:
   postgres_data:
